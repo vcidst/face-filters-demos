@@ -1,5 +1,6 @@
 var ctracker;
 var slider;
+var points_of_interest = [62];
 
 function setup() {
   // setup camera capture
@@ -29,7 +30,12 @@ function draw() {
   var positions = ctracker.getCurrentPosition();
   
   for (var i=0; i<positions.length; i++) {
-    // set the color of the ellipse based on position on screen
-    circle(positions[i][0], positions[i][1], 5);
+    // check if are we interest in this point
+    if(points_of_interest.includes(i)) {
+      // write a large emoji at this location
+      textSize(250);
+      textAlign(CENTER);
+      text('🤩', positions[i][0], positions[i][1]);
+    }
   }
 }

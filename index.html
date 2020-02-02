@@ -14,15 +14,17 @@
         font-weight: normal;
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+
     </style>
   </head>
   <body>
     <textarea id="source">
 
-class: center, middle
+class: center, middle, inverse
 
 # Making Face Filters (inside a browser!)
-### Shailendra Paliwal (@ziscore)
+### Shailendra Paliwal ([@ziscore](http://shailendra.me) 👨🏼‍💻, 🏃🏼‍♂️, 🚵🏼‍♂️)
 
 ---
 
@@ -31,8 +33,27 @@ class: center, middle
 By the end of this workshop, you will know how to track faces and draw objects on them. That's a face filter, right?
 But, before we arrive at the end, we need to know a few things...
 
-1. Understanding Face Filters
-1. [Hands On] Tracking Colors and Blobs
+1. What happens under the hood with face filters?
+
+---
+
+# Workshop Agenda
+
+By the end of this workshop, you will know how to track faces and draw objects on them. That's a face filter, right?
+But, before we arrive at the end, we need to know a few things...
+
+1. What happens under the hood with face filters?
+1. Face Detection vs Face Tracking vs Face Recognition
+1. Using an External Library
+
+---
+
+# Workshop Agenda
+
+By the end of this workshop, you will know how to track faces and draw objects on them. That's a face filter, right?
+But, before we arrive at the end, we need to know a few things...
+
+1. What happens under the hood with face filters?
 1. Face Detection vs Face Tracking vs Face Recognition
 1. Using an External Library
 1. [Hands On] Tracking a Face
@@ -53,29 +74,224 @@ vs
 
 ---
 
+# Using the webcam
+
+```js
+function setup() {
+  // add a webcam capture
+  capture = createCapture(VIDEO);
+  
+  // show this capture
+  capture.show();
+  
+  // create a canvas for this capture
+  createCanvas(400, 400);
+}
+```
+
+.footnote[Go directly to [the P5 Editor - WebcamDemo](https://editor.p5js.org/zscore/full/NAnfbmQv)]
+
+---
+
+# Is this enough though?
+
+Wouldn't it be cool if we could add trails like a Vector to this as well?
+
+---
+
+# Is this enough though?
+
+Wouldn't it be cool if we could add trails like a Vector to this as well?
+
+```js
+function setup() {
+  createCanvas(400, 400);
+  capture = createCapture(VIDEO);
+  capture.hide();
+}
+
+function draw() {
+  // display at half opacity
+  tint(255, 20);
+  image(capture, 0, 0, width, width * capture.height / capture.width);
+}
+```
+
+.footnote[Go directly to [the P5 Editor - demo0](https://editor.p5js.org/zscore/full/m1DS7Ijr)]
+
+---
+
 # Using External Libraries
 
 Programmers create black boxes that other folks can use without going into the details of how does the black box works.
 
-## DRY Principle
-### Don't Repeat Yourself
-
+![](assets/giants.jpg)
 
 ---
 
 # Tracking a face
 
-[demo-1](//shailendra.me/face-filters-demos/demo1)
+## Enters *CLMTracker*
+
+> clmtrackr is a javascript library for fitting facial models to faces in images and video, and can be used for getting precise positions of facial features in an image, or precisely tracking faces in video. 
+
+Seems good enough?
+
+.footnote[CLM stands for Constraint Local Models]
+
+---
+
+# Tracking a face
+
+```js
+function setup() {
+  // setup camera capture
+  var videoInput = createCapture(VIDEO);
+  videoInput.size(size, size);
+  videoInput.position(0, 0);
+  
+  // setup canvas
+  var cnv = createCanvas(size, size);
+  cnv.position(0, 0);
+
+  // setup tracker
+  ctracker = new clm.tracker();
+  ctracker.init(pModel);
+  ctracker.start(videoInput.elt);
+
+  // define colors
+  noStroke();
+  fill('red')
+}
+```
+
+---
+
+# Tracking a face
+
+```js
+function draw() {
+  // clear the canvas
+  clear();    
+
+  // get array of face marker positions [x, y] format
+  var positions = ctracker.getCurrentPosition();
+  
+  for (var i=0; i < positions.length; i++) {
+    // set the color of the ellipse based on position on screen
+    circle(positions[i][0], positions[i][1], 5);
+  }
+}
+```
+
+.footnote[Go directly to [the P5 Editor - demo1](https://editor.p5js.org/zscore/full/3abLY0OF)]
 
 ---
 
 # How does it work?
 
+
+```js
+  // get array of face marker positions [x, y] format
+  var positions = ctracker.getCurrentPosition();
+```
+
+![](assets/clmtrack.png)
+
+
 ---
 
 # Recreating Classic Face Filters
 
+### Ambika's Section 144
+#### Yesterday's showcase
 
+How do we do it?
+
+---
+
+# Recreating Classic Face Filters
+
+### Ambika's Section 144
+
+Add a global variable
+```js
+var points_of_interest = [62];
+```
+
+Change what we do with array `positions`
+```js
+  for (var i=0; i < positions.length; i++) {
+    // check if are we interest in this point
+    if(points_of_interest.includes(i)) {
+      // write a large emoji at this location
+      textSize(250);
+      textAlign(CENTER);
+      text('🤩', positions[i][0], positions[i][1]);
+    }
+  }
+```
+
+.footnote[Go directly to [the P5 Editor - demo2](https://editor.p5js.org/zscore/full/cOWdCGdd)]
+
+---
+
+# Recreating Classic Face Filters
+
+### Dog Filter?????
+
+![](assets/dog-filter.jpg)
+
+---
+
+# Dog Filter?????
+### How do we make it?
+
+Elements of the filter,
+1. Puts dog ears on top of your face
+2. Puts a dog nose
+3. If you open your mouth, there's also a dog tongue!
+
+
+---
+
+# Dog Filter?????
+### How do we make it?
+
+```
+> Implementation of this filter has been left as an exercise for the reader
+```
+
+---
+
+# Dog Filter?????
+## Resources
+
+Adding an image,
+
+```js
+let dog_nose;
+function preload() {
+  dog_nose = loadImage('path/to/an/image/from/the/internet.jpg');
+}
+function setup() {
+  // image(image_name, position_x, position_y)
+  image(dog_nose, 0, 0);
+}
+```
+
+---
+
+# How do we make Eye Trails?
+
+How do we make it really?
+
+---
+
+# Resources
+
+1. CLMTracker - [link to repo](https://github.com/auduno/clmtrackr)
+2. Computer Vision Examples by Kyle McDonald- (link)(https://kylemcdonald.github.io/cv-examples/)
 
 
 

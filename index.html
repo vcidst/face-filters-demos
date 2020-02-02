@@ -308,6 +308,81 @@ How do we do this?
 
 ---
 
+# Eye Trails
+
+How do we crop the canvas?
+
+```js
+var croppedCanvas = get(x, y, width, height);
+```
+
+---
+
+# Eye Trails
+
+Something like this?
+
+```js
+var left_eye = [27], right_eye = [32];
+var lastFrameLeft, lastFrameRight;
+```
+
+
+```js
+  for (var i=0; i < positions.length; i++) {
+    // check if are we interest in this point
+    if(left_eye.includes(i)) {
+        lastFrameLeft = get(positions[i][0] - 10, positions[i][1] - 10, 20, 20);
+        image(lastFrameLeft, positions[i][0], positions[i][1]);
+    }
+
+    /// 
+    if(right_eye.includes(i)) {
+        lastFrameRight = get(positions[i][0] - 10, positions[i][1] - 10, 20, 20);
+        image(lastFrameRight, positions[i][0], positions[i][1]);
+    }
+  }
+```
+
+---
+
+# Eye Trails
+
+More trails!
+
+```js
+  for (var i=0; i < positions.length; i++) {
+    // check if are we interest in this point
+    if(left_eye.includes(i)) {
+        lastFrameLeft = get(positions[i][0] - 10, positions[i][1] - 10, 20, 20);
+        image(lastFrameLeft, positions[i][0], positions[i][1]);
+        image(lastFrameLeft, positions[i][0] + 5, positions[i][1] + 5);
+        image(lastFrameLeft, positions[i][0] + 10, positions[i][1] + 10);
+        image(lastFrameLeft, positions[i][0] + 15, positions[i][1] + 15);
+    }
+
+    /// 
+    if(right_eye.includes(i)) {
+        lastFrameRight = get(positions[i][0] - 10, positions[i][1] - 10, 20, 20);
+        image(lastFrameRight, positions[i][0], positions[i][1]);
+        image(lastFrameRight, positions[i][0] + 5, positions[i][1] + 5);
+        image(lastFrameRight, positions[i][0] + 10, positions[i][1] + 10);
+        image(lastFrameRight, positions[i][0] + 15, positions[i][1] + 15);
+    }
+  }
+```
+
+.footnote[Go directly to [the P5 Editor - demo3](https://editor.p5js.org/zscore/full/vYbhbiZU)]
+
+
+---
+
+classes: middle
+
+# Thanks!
+
+---
+
 # Resources
 
 1. CLMTracker - [link to repo](https://github.com/auduno/clmtrackr)
